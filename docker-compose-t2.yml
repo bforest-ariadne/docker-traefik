@@ -771,7 +771,7 @@ services:
   # Cloudflare-Companion - Automatic CNAME DNS Creation
   cf-companion:
     container_name: cf-companion
-    image: tiredofit/traefik-cloudflare-companion:latest
+    image: docker.pkg.github.com/jwillmer/docker-traefik-cloudflare-companion/docker-traefik-cloudflare-companion:6.1.2
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
