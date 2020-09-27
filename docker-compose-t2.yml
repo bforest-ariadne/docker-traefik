@@ -747,7 +747,7 @@ services:
     security_opt:
       - no-new-privileges:true
     # command: --restart-containers container1,container2,container3
-    command: traefik-certs-dumper file --source /traefik/acme.json --dest /output
+    command: file --source /traefik/acme.json --dest /output
     volumes:
       - $DOCKERDIR/traefik2/acme:/traefik:ro
       - $DOCKERDIR/shared/certs:/output:rw
