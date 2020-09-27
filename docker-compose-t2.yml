@@ -412,6 +412,21 @@ services:
       - "traefik.http.routers.rediscommander-rtr.service=rediscommander-svc"
       - "traefik.http.services.rediscommander-svc.loadbalancer.server.port=8081"
 
+  # InfluxDB - Database for sensor data
+  # Create influxdb.conf
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "$INFLUXDB_PORT:8086"
+    volumes:
+      # - $DOCKERDIR/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+      - $DOCKERDIR/influxdb/db:/var/lib/influxdb
+  #    command: -config /etc/influxdb/influxdb.conf
+
   # phpMyAdmin - Database management
   # Create a new user with admin privileges. Cannot login as MySQL root for some reason.
   phpmyadmin:
