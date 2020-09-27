@@ -123,10 +123,10 @@ services:
         published: 443
         protocol: tcp
         mode: host
-    #      - target: 8080
-    #        published: 8080
-    #        protocol: tcp
-    #        mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
     volumes:
       - $DOCKERDIR/traefik2/rules:/rules # file provider directory
       # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
@@ -399,36 +399,36 @@ services:
 
 
   # Organizr - Unified Frontend
-  # organizr:
-  #   container_name: organizr
-  #   image: organizrtools/organizr-v2:latest
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$ORGANIZR_PORT:80"
-  #   volumes:
-  #     - $DOCKERDIR/organizr:/config
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.organizr-rtr.entrypoints=https"
-  #     - "traefik.http.routers.organizr-rtr.rule=HostHeader(`$DOMAINNAME`) || HostHeader(`www.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.organizr-rtr.middlewares=organizr-redirect@docker,chain-authelia@file"
-  #       # Redirect non-www to www middleware
-  #     - "traefik.http.middlewares.organizr-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
-  #     - "traefik.http.middlewares.organizr-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
-  #     - "traefik.http.middlewares.organizr-redirect.redirectregex.permanent=true"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.organizr-rtr.service=organizr-svc"
-  #     - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
+  organizr:
+    container_name: organizr
+    image: organizrtools/organizr-v2:latest
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$ORGANIZR_PORT:80"
+    volumes:
+      - $DOCKERDIR/organizr:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.organizr-rtr.entrypoints=https"
+      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`$DOMAINNAME`) || HostHeader(`www.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.organizr-rtr.middlewares=organizr-redirect@docker,chain-authelia@file"
+        # Redirect non-www to www middleware
+      - "traefik.http.middlewares.organizr-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
+      - "traefik.http.middlewares.organizr-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
+      - "traefik.http.middlewares.organizr-redirect.redirectregex.permanent=true"
+      ## HTTP Services
+      - "traefik.http.routers.organizr-rtr.service=organizr-svc"
+      - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
 
   # Autoindex - Simple Directory Index
   # autoindex:
