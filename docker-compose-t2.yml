@@ -49,14 +49,14 @@ secrets:
     file: $SECRETSDIR/my_email
   mysql_root_password:
     file: $SECRETSDIR/mysql_root_password
-  plex_claim:
-    file: $SECRETSDIR/plex_claim
-  guac_db_name:
-    file: $SECRETSDIR/guac_db_name
-  guac_mysql_user:
-    file: $SECRETSDIR/guac_mysql_user
-  guac_mysql_password:
-    file: $SECRETSDIR/guac_mysql_password
+  # plex_claim:
+  #   file: $SECRETSDIR/plex_claim
+  # guac_db_name:
+  #   file: $SECRETSDIR/guac_db_name
+  # guac_mysql_user:
+  #   file: $SECRETSDIR/guac_mysql_user
+  # guac_mysql_password:
+  #   file: $SECRETSDIR/guac_mysql_password
 
 ########################### SERVICES
 services:
@@ -309,7 +309,7 @@ services:
       - authelia_session_secret
       - authelia_storage_mysql_password
       - authelia_notifier_smtp_password
-      - authelia_duo_api_secret_key
+      # - authelia_duo_api_secret_key
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -636,48 +636,48 @@ services:
 
   # Guacamole - Remote desktop, SSH, on Telnet on any HTML5 Browser
   # Create all databases and tables first
-  guacamole:
-    image: guacamole/guacamole:latest
-    container_name: guacamole
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$GUACAMOLE_PORT:8080"
-    environment:
-      GUACD_HOSTNAME: guacd
-      MYSQL_HOSTNAME: $DB_HOST
-      MYSQL_PORT: $DB_PORT
-      MYSQL_DATABASE_FILE: /run/secrets/guac_db_name
-      MYSQL_USER_FILE: /run/secrets/guac_mysql_user
-      MYSQL_PASSWORD_FILE: /run/secrets/guac_mysql_password
-    secrets:
-      - guac_db_name
-      - guac_mysql_user
-      - guac_mysql_password
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.guacamole-rtr.entrypoints=https"
-      - "traefik.http.routers.guacamole-rtr.rule=HostHeader(`guac.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.guacamole-rtr.middlewares=chain-authelia@file,add-guacamole"
-      - "traefik.http.middlewares.add-guacamole.addPrefix.prefix=/guacamole"
-      ## HTTP Services
-      - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
-      - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"
+  # guacamole:
+  #   image: guacamole/guacamole:latest
+  #   container_name: guacamole
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$GUACAMOLE_PORT:8080"
+  #   environment:
+  #     GUACD_HOSTNAME: guacd
+  #     MYSQL_HOSTNAME: $DB_HOST
+  #     MYSQL_PORT: $DB_PORT
+  #     MYSQL_DATABASE_FILE: /run/secrets/guac_db_name
+  #     MYSQL_USER_FILE: /run/secrets/guac_mysql_user
+  #     MYSQL_PASSWORD_FILE: /run/secrets/guac_mysql_password
+  #   secrets:
+  #     - guac_db_name
+  #     - guac_mysql_user
+  #     - guac_mysql_password
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.guacamole-rtr.entrypoints=https"
+  #     - "traefik.http.routers.guacamole-rtr.rule=HostHeader(`guac.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.guacamole-rtr.middlewares=chain-authelia@file,add-guacamole"
+  #     - "traefik.http.middlewares.add-guacamole.addPrefix.prefix=/guacamole"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
+  #     - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"
 
-  # Guacamole Daemon - Needed for Guacamole
-  guacd:
-    image: guacamole/guacd
-    container_name: guacd
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
+  # # Guacamole Daemon - Needed for Guacamole
+  # guacd:
+  #   image: guacamole/guacd
+  #   container_name: guacd
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
 
   # Dozzle - Real-time Docker Log Viewer
   dozzle:
