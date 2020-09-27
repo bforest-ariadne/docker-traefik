@@ -49,14 +49,6 @@ secrets:
     file: $SECRETSDIR/my_email
   mysql_root_password:
     file: $SECRETSDIR/mysql_root_password
-  # plex_claim:
-  #   file: $SECRETSDIR/plex_claim
-  # guac_db_name:
-  #   file: $SECRETSDIR/guac_db_name
-  # guac_mysql_user:
-  #   file: $SECRETSDIR/guac_mysql_user
-  # guac_mysql_password:
-  #   file: $SECRETSDIR/guac_mysql_password
 
 ########################### SERVICES
 services:
@@ -492,35 +484,6 @@ services:
       - "traefik.http.routers.organizr-rtr.service=organizr-svc"
       - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
 
-  # # Heimdall - Unified Frontend Alternative
-  # # Putting all services behind Oragnizr slows things down.
-  # heimdall:
-  #   container_name: heimdall
-  #   image: linuxserver/heimdall:latest
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   #    ports:
-  #   #      - "$HEIMDALL_PORT:80"
-  #   volumes:
-  #     - $DOCKERDIR/heimdall:/config
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.heimdall-rtr.entrypoints=https"
-  #     - "traefik.http.routers.heimdall-rtr.rule=HostHeader(`heimdall.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.heimdall-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
-  #     - "traefik.http.services.heimdall-svc.loadbalancer.server.port=80"
-
   # Autoindex - Simple Directory Index
   autoindex:
     container_name: autoindex
@@ -641,44 +604,6 @@ services:
 
   ############################# UTILITIES
 
-  # Firefox - Web Broswer
-  # VNC password not working - check
-  # firefox:
-  #   image: jlesage/firefox:latest
-  #   container_name: firefox
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$FIREFOX_PORT:5800"
-  #   volumes:
-  #     - $DOCKERDIR/firefox:/config
-  #     - $USERDIR/Downloads/completed:/config/downloads
-  #     - /dev/shm:/dev/shm
-  #     - $DOCKERDIR/shared:/shared
-  #   environment:
-  #     USER_ID: $PUID
-  #     GROUP_ID: $PGID
-  #     TZ: $TZ
-  #     UMASK: 002
-  #     KEEP_APP_RUNNING: 1
-  #     CLEAN_TMP_DIR: 1
-  #     DISPLAY_WIDTH: 1600
-  #     DISPLAY_HEIGHT: 960
-  #     VNC_PASSWD: $FIREFOX_VNC_PASSWD
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.firefox-rtr.entrypoints=https"
-  #     - "traefik.http.routers.firefox-rtr.rule=HostHeader(`firefox.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.firefox-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.firefox-rtr.service=firefox-svc"
-  #     - "traefik.http.services.firefox-svc.loadbalancer.server.port=5800"
-
   # Glances - System Information
   glances:
     image: nicolargo/glances:latest
@@ -713,26 +638,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.glances-rtr.service=glances-svc"
       - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
-
-  # APCUPSD - APC UPS Management
-  # create the apcupsd.conf file
-  # apcupsd:
-  #   image: gersilex/apcupsd:latest
-  #   container_name: apcupsd
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   ports:
-  #     - "$APCUPSD_PORT:3551"
-  #   privileged: true
-  #   tty: true
-  #   volumes:
-  #     - /tmp/apcupsd-docker:/tmp/apcupsd-docker
-  #     - $DOCKERDIR/apcupsd/apcupsd.conf:/etc/apcupsd/apcupsd.conf
-  #     - $DOCKERDIR/apcupsd/doshutdown:/etc/apcupsd/doshutdown
-  #     - $DOCKERDIR/apcupsd/apcupsd.events:/var/log/apcupsd.events
 
   # qDirStat - Directory Statistics
   qdirstat:
@@ -769,51 +674,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.qdirstat-rtr.service=qdirstat-svc"
       - "traefik.http.services.qdirstat-svc.loadbalancer.server.port=5800"
-
-  # Guacamole - Remote desktop, SSH, on Telnet on any HTML5 Browser
-  # Create all databases and tables first
-  # guacamole:
-  #   image: guacamole/guacamole:latest
-  #   container_name: guacamole
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$GUACAMOLE_PORT:8080"
-  #   environment:
-  #     GUACD_HOSTNAME: guacd
-  #     MYSQL_HOSTNAME: $DB_HOST
-  #     MYSQL_PORT: $DB_PORT
-  #     MYSQL_DATABASE_FILE: /run/secrets/guac_db_name
-  #     MYSQL_USER_FILE: /run/secrets/guac_mysql_user
-  #     MYSQL_PASSWORD_FILE: /run/secrets/guac_mysql_password
-  #   secrets:
-  #     - guac_db_name
-  #     - guac_mysql_user
-  #     - guac_mysql_password
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.guacamole-rtr.entrypoints=https"
-  #     - "traefik.http.routers.guacamole-rtr.rule=HostHeader(`guac.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.guacamole-rtr.middlewares=chain-authelia@file,add-guacamole"
-  #     - "traefik.http.middlewares.add-guacamole.addPrefix.prefix=/guacamole"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
-  #     - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"
-
-  # # Guacamole Daemon - Needed for Guacamole
-  # guacd:
-  #   image: guacamole/guacd
-  #   container_name: guacd
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
 
   # Dozzle - Real-time Docker Log Viewer
   dozzle:
@@ -884,52 +744,6 @@ services:
       - "traefik.http.routers.statping-rtr.service=statping-svc"
       - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
 
-  # VSCode - VSCode Editing
-  # vscode:
-  #   image: codercom/code-server:latest
-  #   container_name: vscode
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   ports:
-  #     - "$VSCODE_PORT:8080"
-  #   volumes:
-  #     - $USERDIR/server:/home/coder/server
-  #     - $DOCKERDIR:/home/coder/docker
-  #     - $DOCKERDIR/hassio/homeassistant:/home/coder/hassio
-  #     - $DOCKERDIR/homeassistant:/home/coder/homeassistant
-  #     - $USERDIR/Downloads:/home/coder/Downloads
-  #     - $DOCKERDIR/vscode:/home/coder
-  #     - /media/sdocker:/home/coder/sdocker
-  #   environment:
-  #     PASSWORD: $VSCODE_PASSWORD
-  #     # Run as root first, create the directories, then change permissions to user:docker and 775. Disable run as root below.
-  #     user: $PUID:$PGID
-  #     # user: "0"
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.vscode-rtr.entrypoints=https"
-  #     - "traefik.http.routers.vscode-rtr.rule=HostHeader(`code.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.vscode-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.vscode-rtr.service=vscode-svc"
-  #     - "traefik.http.services.vscode-svc.loadbalancer.server.port=8080"
-
-  # SMTP to Telegram - Send SMTP Notifications as Telegram Message
-  # Use case: https://github.com/htpcBeginner/docker-traefik/issues/78
-  # smtp_to_telegram:
-  #   image: kostyaesmukov/smtp_to_telegram
-  #   container_name: smtp_to_telegram
-  #   restart: always
-  #   networks:
-  #     - default
-  #   environment:
-  #     TZ: $TZ
-  #     ST_TELEGRAM_CHAT_IDS: $TGRAM_CHAT_ID
-  #     ST_TELEGRAM_BOT_TOKEN: $TGRAM_BOT_TOKEN
-  #     ST_TELEGRAM_MESSAGE_TEMPLATE: "{subject}\\n{body}"
 
   ############################# MAINTENANCE
 
