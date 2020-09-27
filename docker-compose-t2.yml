@@ -742,7 +742,7 @@ services:
   # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
   certdumper:
     container_name: traefik_certdumper
-    image: humenius/traefik-certs-dumper:latest
+    image: ldez/traefik-certs-dumper:latest
     network_mode: none
     security_opt:
       - no-new-privileges:true
