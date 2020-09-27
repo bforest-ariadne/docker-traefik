@@ -236,8 +236,8 @@ services:
   # https://www.smarthomebeginner.com/google-oauth-with-traefik-docker/
   oauth:
     container_name: oauth
-    image: thomseddon/traefik-forward-auth:latest
-    # image: thomseddon/traefik-forward-auth:2.1-arm # Use this image with Raspberry Pi
+    # image: thomseddon/traefik-forward-auth:latest
+    image: thomseddon/traefik-forward-auth:2.1-arm # Use this image with Raspberry Pi
     restart: unless-stopped
     networks:
       - t2_proxy
@@ -278,40 +278,40 @@ services:
       - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
 
   # Authelia (Lite) - Self-Hosted Single Sign-On and Two-Factor Authentication
-  authelia:
-    container_name: authelia
-    # Check this before upgrading: https://github.com/authelia/authelia/blob/master/BREAKING.md
-    image: authelia/authelia:latest
-    restart: always
-    networks:
-      - t2_proxy
-    # ports:
-    #   - "9091:9091"
-    volumes:
-      - $DOCKERDIR/authelia:/config
-    environment:
-      - TZ=$TZ
-      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
-      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
-      - AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE=/run/secrets/authelia_storage_mysql_password
-      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/authelia_notifier_smtp_password
-      - AUTHELIA_DUO_API_SECRET_KEY_FILE=/run/secrets/authelia_duo_api_secret_key
-    secrets:
-      - authelia_jwt_secret
-      - authelia_session_secret
-      - authelia_storage_mysql_password
-      - authelia_notifier_smtp_password
-      # - authelia_duo_api_secret_key
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.authelia-rtr.entrypoints=https"
-      - "traefik.http.routers.authelia-rtr.rule=HostHeader(`authelia.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
-      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
+  # authelia:
+  #   container_name: authelia
+  #   # Check this before upgrading: https://github.com/authelia/authelia/blob/master/BREAKING.md
+  #   image: authelia/authelia:latest
+  #   restart: always
+  #   networks:
+  #     - t2_proxy
+  #   # ports:
+  #   #   - "9091:9091"
+  #   volumes:
+  #     - $DOCKERDIR/authelia:/config
+  #   environment:
+  #     - TZ=$TZ
+  #     - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
+  #     - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
+  #     - AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE=/run/secrets/authelia_storage_mysql_password
+  #     - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/authelia_notifier_smtp_password
+  #     - AUTHELIA_DUO_API_SECRET_KEY_FILE=/run/secrets/authelia_duo_api_secret_key
+  #   secrets:
+  #     - authelia_jwt_secret
+  #     - authelia_session_secret
+  #     - authelia_storage_mysql_password
+  #     - authelia_notifier_smtp_password
+  #     # - authelia_duo_api_secret_key
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.authelia-rtr.entrypoints=https"
+  #     - "traefik.http.routers.authelia-rtr.rule=HostHeader(`authelia.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.authelia-rtr.service=authelia-svc"
+  #     - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
 
   # Portainer - WebUI for Containers
   portainer:
@@ -347,166 +347,112 @@ services:
 
   # MariaDB - MySQL Database
   # After starting container for first time dexec and mysqladmin -u root password <password>
-  mariadb:
-    container_name: mariadb
-    image: linuxserver/mariadb:latest
-    restart: always
-    networks:
-      t2_proxy:
-        ipv4_address: 192.168.90.250
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/mariadb/data:/config
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password # Not taking this pw during initialization
-    secrets:
-      - mysql_root_password
+  # mariadb:
+  #   container_name: mariadb
+  #   image: linuxserver/mariadb:latest
+  #   restart: always
+  #   networks:
+  #     t2_proxy:
+  #       ipv4_address: 192.168.90.250
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/mariadb/data:/config
+  #     - /etc/timezone:/etc/timezone:ro
+  #     - /etc/localtime:/etc/localtime:ro
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password # Not taking this pw during initialization
+  #   secrets:
+  #     - mysql_root_password
 
-  # Redis - Key-value Store
-  redis:
-    container_name: redis
-    image: redis:latest
-    restart: unless-stopped
-    entrypoint: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/redis/data:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-
-  # Redis Commander - Redis Management Tool
-  rediscommander:
-    container_name: rediscommander
-    image: rediscommander/redis-commander:latest
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - REDIS_HOST=redis
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.rediscommander-rtr.entrypoints=https"
-      - "traefik.http.routers.rediscommander-rtr.rule=HostHeader(`rediscom.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.rediscommander-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.rediscommander-rtr.service=rediscommander-svc"
-      - "traefik.http.services.rediscommander-svc.loadbalancer.server.port=8081"
+  # # Redis - Key-value Store
+  # redis:
+  #   container_name: redis
+  #   image: redis:latest
+  #   restart: unless-stopped
+  #   entrypoint: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/redis/data:/data
+  #     - /etc/timezone:/etc/timezone:ro
+  #     - /etc/localtime:/etc/localtime:ro
 
   # InfluxDB - Database for sensor data
   # Create influxdb.conf
-  influxdb:
-    image: influxdb:latest
-    container_name: influxdb
-    restart: always
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - "$INFLUXDB_PORT:8086"
-    volumes:
-      # - $DOCKERDIR/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
-      - $DOCKERDIR/influxdb/db:/var/lib/influxdb
-  #    command: -config /etc/influxdb/influxdb.conf
-
-  # phpMyAdmin - Database management
-  # Create a new user with admin privileges. Cannot login as MySQL root for some reason.
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    #depends_on:
-    #  - mariadb
-    security_opt:
-      - no-new-privileges:true
-    # volumes:
-    #  - $DOCKERDIR/phpmyadmin:/etc/phpmyadmin
-    environment:
-      - PMA_HOST=mariadb
-      - PMA_PORT=3306
-      # - PMA_ARBITRARY=1
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
-    secrets:
-      - mysql_root_password
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
-      - "traefik.http.routers.phpmyadmin-rtr.rule=HostHeader(`pma.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.phpmyadmin-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.phpmyadmin-rtr.service=phpmyadmin-svc"
-      - "traefik.http.services.phpmyadmin-svc.loadbalancer.server.port=80"
+  # influxdb:
+  #   image: influxdb:latest
+  #   container_name: influxdb
+  #   restart: always
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   ports:
+  #     - "$INFLUXDB_PORT:8086"
+  #   volumes:
+  #     # - $DOCKERDIR/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+  #     - $DOCKERDIR/influxdb/db:/var/lib/influxdb
+  # #    command: -config /etc/influxdb/influxdb.conf
 
 
   # Organizr - Unified Frontend
-  organizr:
-    container_name: organizr
-    image: organizrtools/organizr-v2:latest
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$ORGANIZR_PORT:80"
-    volumes:
-      - $DOCKERDIR/organizr:/config
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.organizr-rtr.entrypoints=https"
-      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`$DOMAINNAME`) || HostHeader(`www.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.organizr-rtr.middlewares=organizr-redirect@docker,chain-authelia@file"
-        # Redirect non-www to www middleware
-      - "traefik.http.middlewares.organizr-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
-      - "traefik.http.middlewares.organizr-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
-      - "traefik.http.middlewares.organizr-redirect.redirectregex.permanent=true"
-      ## HTTP Services
-      - "traefik.http.routers.organizr-rtr.service=organizr-svc"
-      - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
+  # organizr:
+  #   container_name: organizr
+  #   image: organizrtools/organizr-v2:latest
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$ORGANIZR_PORT:80"
+  #   volumes:
+  #     - $DOCKERDIR/organizr:/config
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.organizr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.organizr-rtr.rule=HostHeader(`$DOMAINNAME`) || HostHeader(`www.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.organizr-rtr.middlewares=organizr-redirect@docker,chain-authelia@file"
+  #       # Redirect non-www to www middleware
+  #     - "traefik.http.middlewares.organizr-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
+  #     - "traefik.http.middlewares.organizr-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
+  #     - "traefik.http.middlewares.organizr-redirect.redirectregex.permanent=true"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.organizr-rtr.service=organizr-svc"
+  #     - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
 
   # Autoindex - Simple Directory Index
-  autoindex:
-    container_name: autoindex
-    image: dceoy/nginx-autoindex:latest
-    restart: always
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$AUTOINDEX_PORT:80"
-    volumes:
-      - /media:/var/lib/nginx/html:ro # Location you want to index
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.autoindex-rtr.entrypoints=https"
-      - "traefik.http.routers.autoindex-rtr.rule=HostHeader(`index.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.autoindex-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.autoindex-rtr.service=autoindex-svc"
-      - "traefik.http.services.autoindex-svc.loadbalancer.server.port=80"
+  # autoindex:
+  #   container_name: autoindex
+  #   image: dceoy/nginx-autoindex:latest
+  #   restart: always
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$AUTOINDEX_PORT:80"
+  #   volumes:
+  #     - /media:/var/lib/nginx/html:ro # Location you want to index
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.autoindex-rtr.entrypoints=https"
+  #     - "traefik.http.routers.autoindex-rtr.rule=HostHeader(`index.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.autoindex-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.autoindex-rtr.service=autoindex-svc"
+  #     - "traefik.http.services.autoindex-svc.loadbalancer.server.port=80"
 
 
 
@@ -516,282 +462,280 @@ services:
 
   # phpMyAdmin - Database management
   # Create a new user with admin privileges. Cannot login as MySQL root for some reason.
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$PHPMYADMIN_PORT:80"
-    # volumes:
-    #   - $DOCKERDIR/phpmyadmin:/etc/phpmyadmin
-    environment:
-      - PMA_HOST=$DB_HOST
-      - PMA_PORT=$DB_PORT
-      #- PMA_ARBITRARY=1
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
-    secrets:
-      - mysql_root_password
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
-      - "traefik.http.routers.phpmyadmin-rtr.rule=HostHeader(`pma.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.phpmyadmin-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.phpmyadmin-rtr.service=phpmyadmin-svc"
-      - "traefik.http.services.phpmyadmin-svc.loadbalancer.server.port=80"
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   container_name: phpmyadmin
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$PHPMYADMIN_PORT:80"
+  #   # volumes:
+  #   #   - $DOCKERDIR/phpmyadmin:/etc/phpmyadmin
+  #   environment:
+  #     - PMA_HOST=$DB_HOST
+  #     - PMA_PORT=$DB_PORT
+  #     #- PMA_ARBITRARY=1
+  #     - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
+  #   secrets:
+  #     - mysql_root_password
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
+  #     - "traefik.http.routers.phpmyadmin-rtr.rule=HostHeader(`pma.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.phpmyadmin-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.phpmyadmin-rtr.service=phpmyadmin-svc"
+  #     - "traefik.http.services.phpmyadmin-svc.loadbalancer.server.port=80"
 
-  # Redis - Key-value Store
-  # Moved to NAS
 
   # Redis Commander - Redis Management Tool
-  rediscommander:
-    container_name: rediscommander
-    image: rediscommander/redis-commander:latest
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    # ports:
-    #   - "$REDISCOMMANDER_PORT:8081"
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - REDIS_HOST=$NAS_IP
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.rediscommander-rtr.entrypoints=https"
-      - "traefik.http.routers.rediscommander-rtr.rule=HostHeader(`rediscom.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.rediscommander-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.rediscommander-rtr.service=rediscommander-svc"
-      - "traefik.http.services.rediscommander-svc.loadbalancer.server.port=8081"
+  # rediscommander:
+  #   container_name: rediscommander
+  #   image: rediscommander/redis-commander:latest
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   # ports:
+  #   #   - "$REDISCOMMANDER_PORT:8081"
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   environment:
+  #     - REDIS_HOST=$NAS_IP
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.rediscommander-rtr.entrypoints=https"
+  #     - "traefik.http.routers.rediscommander-rtr.rule=HostHeader(`rediscom.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.rediscommander-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.rediscommander-rtr.service=rediscommander-svc"
+  #     - "traefik.http.services.rediscommander-svc.loadbalancer.server.port=8081"
 
   # Grafana - Graphical data visualization for InfluxDB data
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$GRAFANA_PORT:3000"
-    user: "0"
-    volumes:
-      - $DOCKERDIR/grafana:/var/lib/grafana
-    environment:
-      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.grafana-rtr.entrypoints=https"
-      - "traefik.http.routers.grafana-rtr.rule=HostHeader(`grafana.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.grafana-rtr.service=grafana-svc"
-      - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$GRAFANA_PORT:3000"
+  #   user: "0"
+  #   volumes:
+  #     - $DOCKERDIR/grafana:/var/lib/grafana
+  #   environment:
+  #     GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.grafana-rtr.entrypoints=https"
+  #     - "traefik.http.routers.grafana-rtr.rule=HostHeader(`grafana.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.grafana-rtr.service=grafana-svc"
+  #     - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
 
 
 
   ############################# UTILITIES
 
   # Glances - System Information
-  glances:
-    image: nicolargo/glances:latest
-    container_name: glances
-    restart: unless-stopped
-    privileged: true
-    # network_mode: host
-    networks:
-      - t2_proxy
-      - socket_proxy
-    depends_on:
-      - socket-proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$GLANCES_PORT:61208"
-    pid: host
-    volumes:
-      - $DOCKERDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
-      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
-    environment:
-      # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
-      GLANCES_OPT: "-w"
-      DOCKER_HOST: tcp://socket-proxy:2375
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.glances-rtr.entrypoints=https"
-      - "traefik.http.routers.glances-rtr.rule=HostHeader(`nglances.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.glances-rtr.service=glances-svc"
-      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+  # glances:
+  #   image: nicolargo/glances:latest
+  #   container_name: glances
+  #   restart: unless-stopped
+  #   privileged: true
+  #   # network_mode: host
+  #   networks:
+  #     - t2_proxy
+  #     - socket_proxy
+  #   depends_on:
+  #     - socket-proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$GLANCES_PORT:61208"
+  #   pid: host
+  #   volumes:
+  #     - $DOCKERDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
+  #     # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+  #   environment:
+  #     # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
+  #     GLANCES_OPT: "-w"
+  #     DOCKER_HOST: tcp://socket-proxy:2375
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.glances-rtr.entrypoints=https"
+  #     - "traefik.http.routers.glances-rtr.rule=HostHeader(`nglances.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.glances-rtr.service=glances-svc"
+  #     - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
 
   # qDirStat - Directory Statistics
-  qdirstat:
-    image: jlesage/qdirstat:latest
-    container_name: qdirstat
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$QDIRSTAT_PORT:5800"
-    volumes:
-      - $USERDIR:/storage:ro
-      - $DOCKERDIR/qdirstat/config:/config:rw
-      - /media:/nas
-    environment:
-      USER_ID: $PUID
-      GROUP_ID: $PGID
-      UMASK: 002
-      TZ: $TZ
-      KEEP_APP_RUNNING: 1
-      CLEAN_TMP_DIR: 1
-      DISPLAY_WIDTH: 1600
-      DISPLAY_HEIGHT: 960
-      VNC_PASSWORD: $QDIRSTAT_VNC_PASSWD
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.qdirstat-rtr.entrypoints=https"
-      - "traefik.http.routers.qdirstat-rtr.rule=HostHeader(`qdirstat.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.qdirstat-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.qdirstat-rtr.service=qdirstat-svc"
-      - "traefik.http.services.qdirstat-svc.loadbalancer.server.port=5800"
+  # qdirstat:
+  #   image: jlesage/qdirstat:latest
+  #   container_name: qdirstat
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$QDIRSTAT_PORT:5800"
+  #   volumes:
+  #     - $USERDIR:/storage:ro
+  #     - $DOCKERDIR/qdirstat/config:/config:rw
+  #     - /media:/nas
+  #   environment:
+  #     USER_ID: $PUID
+  #     GROUP_ID: $PGID
+  #     UMASK: 002
+  #     TZ: $TZ
+  #     KEEP_APP_RUNNING: 1
+  #     CLEAN_TMP_DIR: 1
+  #     DISPLAY_WIDTH: 1600
+  #     DISPLAY_HEIGHT: 960
+  #     VNC_PASSWORD: $QDIRSTAT_VNC_PASSWD
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.qdirstat-rtr.entrypoints=https"
+  #     - "traefik.http.routers.qdirstat-rtr.rule=HostHeader(`qdirstat.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.qdirstat-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.qdirstat-rtr.service=qdirstat-svc"
+  #     - "traefik.http.services.qdirstat-svc.loadbalancer.server.port=5800"
 
   # Dozzle - Real-time Docker Log Viewer
-  dozzle:
-    image: amir20/dozzle:latest
-    container_name: dozzle
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-      - socket_proxy
-    depends_on:
-      - socket-proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$DOZZLE_PORT:8080"
-    environment:
-      DOZZLE_LEVEL: info
-      DOZZLE_TAILSIZE: 300
-      DOZZLE_FILTER: "status=running"
-      # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
-      DOCKER_HOST: tcp://socket-proxy:2375
-    # volumes:
-    #  - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.dozzle-rtr.entrypoints=https"
-      - "traefik.http.routers.dozzle-rtr.rule=HostHeader(`dozzle.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
-      - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+  # dozzle:
+  #   image: amir20/dozzle:latest
+  #   container_name: dozzle
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #     - socket_proxy
+  #   depends_on:
+  #     - socket-proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$DOZZLE_PORT:8080"
+  #   environment:
+  #     DOZZLE_LEVEL: info
+  #     DOZZLE_TAILSIZE: 300
+  #     DOZZLE_FILTER: "status=running"
+  #     # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
+  #     DOCKER_HOST: tcp://socket-proxy:2375
+  #   # volumes:
+  #   #  - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.dozzle-rtr.entrypoints=https"
+  #     - "traefik.http.routers.dozzle-rtr.rule=HostHeader(`dozzle.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
+  #     - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
 
   # StatPing - Status Page & Monitoring Server
-  statping:
-    image: hunterlong/statping:latest
-    container_name: statping
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$STATPING_PORT:8080"
-    volumes:
-      - $DOCKERDIR/statping:/app
-    environment:
-      VIRTUAL_HOST: localhost
-      VIRTUAL_PORT: 8080
-      DB_CONN: postgres
-      DB_HOST: postgres
-      DB_USER: $STATPING_DB_USER
-      DB_PASS: $STATPING_DB_PASS
-      DB_DATABASE: $STATPING_DB
-      IS_DOCKER: "true"
-      DISABLE_LOGS: "false"
-      NAME: StatPing
-      DESCRIPTION: Monitor web services
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.statping-rtr.entrypoints=https"
-      - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.statping-rtr.middlewares=chain-no-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.statping-rtr.service=statping-svc"
-      - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
+  # statping:
+  #   image: hunterlong/statping:latest
+  #   container_name: statping
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$STATPING_PORT:8080"
+  #   volumes:
+  #     - $DOCKERDIR/statping:/app
+  #   environment:
+  #     VIRTUAL_HOST: localhost
+  #     VIRTUAL_PORT: 8080
+  #     DB_CONN: postgres
+  #     DB_HOST: postgres
+  #     DB_USER: $STATPING_DB_USER
+  #     DB_PASS: $STATPING_DB_PASS
+  #     DB_DATABASE: $STATPING_DB
+  #     IS_DOCKER: "true"
+  #     DISABLE_LOGS: "false"
+  #     NAME: StatPing
+  #     DESCRIPTION: Monitor web services
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.statping-rtr.entrypoints=https"
+  #     - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.statping-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.statping-rtr.service=statping-svc"
+  #     - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
 
 
   ############################# MAINTENANCE
 
   # WatchTower - Automatic Docker Container Updates
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: unless-stopped
-    networks:
-      - default
-      - socket_proxy
-    depends_on:
-      - socket-proxy
-    environment:
-      TZ: $TZ
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_REMOVE_VOLUMES: "true"
-      WATCHTOWER_INCLUDE_STOPPED: "true"
-      WATCHTOWER_NO_STARTUP_MESSAGE: "false"
-      WATCHTOWER_SCHEDULE: "0 30 12 * * *" # Everyday at 12:30
-      WATCHTOWER_NOTIFICATIONS: shoutrrr
-      WATCHTOWER_NOTIFICATION_URL: "telegram://$TGRAM_BOT_TOKEN@telegram?channels=$TGRAM_CHAT_ID"
-      WATCHTOWER_NOTIFICATIONS_LEVEL: info
-      DOCKER_HOST: tcp://socket-proxy:2375
-      DOCKER_API_VERSION: "1.40"
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   restart: unless-stopped
+  #   networks:
+  #     - default
+  #     - socket_proxy
+  #   depends_on:
+  #     - socket-proxy
+  #   environment:
+  #     TZ: $TZ
+  #     WATCHTOWER_CLEANUP: "true"
+  #     WATCHTOWER_REMOVE_VOLUMES: "true"
+  #     WATCHTOWER_INCLUDE_STOPPED: "true"
+  #     WATCHTOWER_NO_STARTUP_MESSAGE: "false"
+  #     WATCHTOWER_SCHEDULE: "0 30 12 * * *" # Everyday at 12:30
+  #     WATCHTOWER_NOTIFICATIONS: shoutrrr
+  #     WATCHTOWER_NOTIFICATION_URL: "telegram://$TGRAM_BOT_TOKEN@telegram?channels=$TGRAM_CHAT_ID"
+  #     WATCHTOWER_NOTIFICATIONS_LEVEL: info
+  #     DOCKER_HOST: tcp://socket-proxy:2375
+  #     DOCKER_API_VERSION: "1.40"
 
   # Docker-GC - Automatic Docker Garbage Collection
   # Create docker-gc-exclude file
-  dockergc:
-    image: clockworksoul/docker-gc-cron:latest
-    container_name: docker-gc
-    restart: unless-stopped
-    networks:
-      - socket_proxy
-    depends_on:
-      - socket-proxy
-    volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
-      - $DOCKERDIR/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
-    environment:
-      CRON: 0 0 0 * * ? # Everyday at midnight. Previously 0 0 * * *
-      FORCE_IMAGE_REMOVAL: 1
-      FORCE_CONTAINER_REMOVAL: 0
-      GRACE_PERIOD_SECONDS: 604800
-      DRY_RUN: 0
-      CLEAN_UP_VOLUMES: 1
-      TZ: $TZ
-      DOCKER_HOST: tcp://socket-proxy:2375
+  # dockergc:
+  #   image: clockworksoul/docker-gc-cron:latest
+  #   container_name: docker-gc
+  #   restart: unless-stopped
+  #   networks:
+  #     - socket_proxy
+  #   depends_on:
+  #     - socket-proxy
+  #   volumes:
+  #     # - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
+  #     - $DOCKERDIR/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
+  #   environment:
+  #     CRON: 0 0 0 * * ? # Everyday at midnight. Previously 0 0 * * *
+  #     FORCE_IMAGE_REMOVAL: 1
+  #     FORCE_CONTAINER_REMOVAL: 0
+  #     GRACE_PERIOD_SECONDS: 604800
+  #     DRY_RUN: 0
+  #     CLEAN_UP_VOLUMES: 1
+  #     TZ: $TZ
+  #     DOCKER_HOST: tcp://socket-proxy:2375
 
   # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
   certdumper:
