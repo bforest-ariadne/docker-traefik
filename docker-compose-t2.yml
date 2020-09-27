@@ -323,6 +323,8 @@ services:
     networks:
       - t2_proxy
       - socket_proxy
+    ports:
+      - 9000:9000
     depends_on:
       - socket-proxy
     security_opt:
