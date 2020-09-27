@@ -85,7 +85,7 @@ services:
       # - --providers.docker.endpoint=tcp://socket-proxy:2375
       # - --providers.docker.defaultrule=HostHeader(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
-      # - --entrypoints.https.http.middlewares=chain-authelia@file
+      - --entrypoints.https.http.middlewares=chain-basic-auth@file
       # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
       - --entrypoints.https.http.tls.certresolver=dns-cloudflare
       - --entrypoints.https.http.tls.domains[0].main=$DOMAINNAME
@@ -152,7 +152,7 @@ services:
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## Middlewares
-      # - "traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.traefik-rtr.middlewares=chain-basic-auth@file"
 
   # Traefik - Custom Error Pages
   traefik-error-pages:
@@ -340,7 +340,7 @@ services:
       - "traefik.http.routers.portainer-rtr.entrypoints=https"
       - "traefik.http.routers.portainer-rtr.rule=HostHeader(`portainer.$DOMAINNAME`)"
       ## Middlewares
-      # - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file" # Authelia
+      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Authelia
       ## HTTP Services
       - "traefik.http.routers.portainer-rtr.service=portainer-svc"
       - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
@@ -423,7 +423,7 @@ services:
       - "traefik.http.routers.organizr-rtr.entrypoints=https"
       - "traefik.http.routers.organizr-rtr.rule=HostHeader(`$DOMAINNAME`) || HostHeader(`www.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.organizr-rtr.middlewares=organizr-redirect@docker,chain-authelia@file"
+      - "traefik.http.routers.organizr-rtr.middlewares=organizr-redirect@docker,chain-basic-auth@file"
         # Redirect non-www to www middleware
       - "traefik.http.middlewares.organizr-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
       - "traefik.http.middlewares.organizr-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
