@@ -656,40 +656,40 @@ services:
       - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
 
   # StatPing - Status Page & Monitoring Server
-  statping:
-    image: hunterlong/statping:latest
-    container_name: statping
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # ports:
-    #   - "$STATPING_PORT:8080"
-    volumes:
-      - $DOCKERDIR/statping:/app
-    environment:
-      VIRTUAL_HOST: localhost
-      VIRTUAL_PORT: 8080
-      DB_CONN: postgres
-      DB_HOST: postgres
-      DB_USER: $STATPING_DB_USER
-      DB_PASS: $STATPING_DB_PASS
-      DB_DATABASE: $STATPING_DB
-      IS_DOCKER: "true"
-      DISABLE_LOGS: "false"
-      NAME: StatPing
-      DESCRIPTION: Monitor web services
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.statping-rtr.entrypoints=https"
-      - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.statping-rtr.middlewares=chain-no-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.statping-rtr.service=statping-svc"
-      - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
+  # statping:
+  #   image: hunterlong/statping:latest
+  #   container_name: statping
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$STATPING_PORT:8080"
+  #   volumes:
+  #     - $DOCKERDIR/statping:/app
+  #   environment:
+  #     VIRTUAL_HOST: localhost
+  #     VIRTUAL_PORT: 8080
+  #     DB_CONN: postgres
+  #     DB_HOST: postgres
+  #     DB_USER: $STATPING_DB_USER
+  #     DB_PASS: $STATPING_DB_PASS
+  #     DB_DATABASE: $STATPING_DB
+  #     IS_DOCKER: "true"
+  #     DISABLE_LOGS: "false"
+  #     NAME: StatPing
+  #     DESCRIPTION: Monitor web services
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.statping-rtr.entrypoints=https"
+  #     - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.statping-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.statping-rtr.service=statping-svc"
+  #     - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
 
 
   ############################# MAINTENANCE
