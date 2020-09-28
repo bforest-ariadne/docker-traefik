@@ -779,7 +779,7 @@ services:
       - socket_proxy
     depends_on:
       - socket-proxy
-    volumes:
+    # volumes:
     #  - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
     environment:
       - TIMEZONE=$TZ
