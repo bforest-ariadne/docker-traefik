@@ -97,7 +97,7 @@ services:
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory
       # - --providers.file.filename=/path/to/file # Load dynamic configuration from a file
       - --providers.file.watch=true # Only works on top level files in the rules folder
-      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
+      # - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
@@ -155,26 +155,26 @@ services:
       - "traefik.http.routers.traefik-rtr.middlewares=chain-basic-auth@file"
 
   # Traefik - Custom Error Pages
-  # traefik-error-pages:
-  #   container_name: traefik-error-pages
-  #   image: guillaumebriday/traefik-custom-error-pages
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   labels:
-  #     - "traefik.enable=true"
-  #     # HTTP Routers
-  #     - "traefik.http.routers.traefik-error-pages-rtr.entrypoints=https"
-  #     - "traefik.http.routers.traefik-error-pages-rtr.rule=HostRegexp(`{host:.+}`)"
-  #     - "traefik.http.routers.traefik-error-pages-rtr.priority=1"
-  #     # Middlewares
-  #     - "traefik.http.routers.traefik-error-pages-rtr.middlewares=traefik-error-pages"
-  #     - "traefik.http.middlewares.traefik-error-pages.errors.service=traefik-error-pages-svc"
-  #     - "traefik.http.middlewares.traefik-error-pages.errors.status=401,403,404,429,500,502,503"
-  #     - "traefik.http.middlewares.traefik-error-pages.errors.query=/{status}.html"
-  #     # HTTP Services
-  #     - "traefik.http.routers.traefik-error-pages-rtr.service=traefik-error-pages-svc"
-  #     - "traefik.http.services.traefik-error-pages-svc.loadbalancer.server.port=80"
+  traefik-error-pages:
+    container_name: traefik-error-pages
+    image: acouvreur/traefik-custom-error-pages
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    labels:
+      - "traefik.enable=true"
+      # HTTP Routers
+      - "traefik.http.routers.traefik-error-pages-rtr.entrypoints=https"
+      - "traefik.http.routers.traefik-error-pages-rtr.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.traefik-error-pages-rtr.priority=1"
+      # Middlewares
+      - "traefik.http.routers.traefik-error-pages-rtr.middlewares=traefik-error-pages"
+      - "traefik.http.middlewares.traefik-error-pages.errors.service=traefik-error-pages-svc"
+      - "traefik.http.middlewares.traefik-error-pages.errors.status=401,403,404,429,500,502,503"
+      - "traefik.http.middlewares.traefik-error-pages.errors.query=/{status}.html"
+      # HTTP Services
+      - "traefik.http.routers.traefik-error-pages-rtr.service=traefik-error-pages-svc"
+      - "traefik.http.services.traefik-error-pages-svc.loadbalancer.server.port=80"
 
   # Docker Socket Proxy - Security Enchanced Proxy for Docker Socket
   socket-proxy:
