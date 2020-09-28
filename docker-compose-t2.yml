@@ -551,39 +551,40 @@ services:
   ############################# UTILITIES
 
   # Glances - System Information
-  # glances:
-  #   image: nicolargo/glances:latest
-  #   container_name: glances
-  #   restart: unless-stopped
-  #   privileged: true
-  #   # network_mode: host
-  #   networks:
-  #     - t2_proxy
-  #     - socket_proxy
-  #   depends_on:
-  #     - socket-proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$GLANCES_PORT:61208"
-  #   pid: host
-  #   volumes:
-  #     - $DOCKERDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
-  #     # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
-  #   environment:
-  #     # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
-  #     GLANCES_OPT: "-w"
-  #     DOCKER_HOST: tcp://socket-proxy:2375
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.glances-rtr.entrypoints=https"
-  #     - "traefik.http.routers.glances-rtr.rule=HostHeader(`nglances.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.glances-rtr.service=glances-svc"
-  #     - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+  glances:
+    # image: nicolargo/glances:latest
+    image: jdreinhardt/glances:latest # arm
+    container_name: glances
+    restart: unless-stopped
+    privileged: true
+    # network_mode: host
+    networks:
+      - t2_proxy
+      - socket_proxy
+    depends_on:
+      - socket-proxy
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$GLANCES_PORT:61208"
+    pid: host
+    volumes:
+      - $DOCKERDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+    environment:
+      # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
+      GLANCES_OPT: "-w"
+      DOCKER_HOST: tcp://socket-proxy:2375
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.glances-rtr.entrypoints=https"
+      - "traefik.http.routers.glances-rtr.rule=HostHeader(`nglances.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.glances-rtr.service=glances-svc"
+      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
 
   # qDirStat - Directory Statistics
   # qdirstat:
@@ -622,122 +623,123 @@ services:
   #     - "traefik.http.services.qdirstat-svc.loadbalancer.server.port=5800"
 
   # Dozzle - Real-time Docker Log Viewer
-  # dozzle:
-  #   image: amir20/dozzle:latest
-  #   container_name: dozzle
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #     - socket_proxy
-  #   depends_on:
-  #     - socket-proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$DOZZLE_PORT:8080"
-  #   environment:
-  #     DOZZLE_LEVEL: info
-  #     DOZZLE_TAILSIZE: 300
-  #     DOZZLE_FILTER: "status=running"
-  #     # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
-  #     DOCKER_HOST: tcp://socket-proxy:2375
-  #   # volumes:
-  #   #  - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.dozzle-rtr.entrypoints=https"
-  #     - "traefik.http.routers.dozzle-rtr.rule=HostHeader(`dozzle.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
-  #     - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+      - socket_proxy
+    depends_on:
+      - socket-proxy
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$DOZZLE_PORT:8080"
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running"
+      # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
+      DOCKER_HOST: tcp://socket-proxy:2375
+    # volumes:
+    #  - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dozzle-rtr.entrypoints=https"
+      - "traefik.http.routers.dozzle-rtr.rule=HostHeader(`dozzle.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
+      - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
 
   # StatPing - Status Page & Monitoring Server
-  # statping:
-  #   image: hunterlong/statping:latest
-  #   container_name: statping
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$STATPING_PORT:8080"
-  #   volumes:
-  #     - $DOCKERDIR/statping:/app
-  #   environment:
-  #     VIRTUAL_HOST: localhost
-  #     VIRTUAL_PORT: 8080
-  #     DB_CONN: postgres
-  #     DB_HOST: postgres
-  #     DB_USER: $STATPING_DB_USER
-  #     DB_PASS: $STATPING_DB_PASS
-  #     DB_DATABASE: $STATPING_DB
-  #     IS_DOCKER: "true"
-  #     DISABLE_LOGS: "false"
-  #     NAME: StatPing
-  #     DESCRIPTION: Monitor web services
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.statping-rtr.entrypoints=https"
-  #     - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.statping-rtr.middlewares=chain-no-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.statping-rtr.service=statping-svc"
-  #     - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
+  statping:
+    image: hunterlong/statping:latest
+    container_name: statping
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$STATPING_PORT:8080"
+    volumes:
+      - $DOCKERDIR/statping:/app
+    environment:
+      VIRTUAL_HOST: localhost
+      VIRTUAL_PORT: 8080
+      DB_CONN: postgres
+      DB_HOST: postgres
+      DB_USER: $STATPING_DB_USER
+      DB_PASS: $STATPING_DB_PASS
+      DB_DATABASE: $STATPING_DB
+      IS_DOCKER: "true"
+      DISABLE_LOGS: "false"
+      NAME: StatPing
+      DESCRIPTION: Monitor web services
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.statping-rtr.entrypoints=https"
+      - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.statping-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.statping-rtr.service=statping-svc"
+      - "traefik.http.services.statping-svc.loadbalancer.server.port=8080"
 
 
   ############################# MAINTENANCE
 
   # WatchTower - Automatic Docker Container Updates
-  # watchtower:
-  #   image: containrrr/watchtower
-  #   container_name: watchtower
-  #   restart: unless-stopped
-  #   networks:
-  #     - default
-  #     - socket_proxy
-  #   depends_on:
-  #     - socket-proxy
-  #   environment:
-  #     TZ: $TZ
-  #     WATCHTOWER_CLEANUP: "true"
-  #     WATCHTOWER_REMOVE_VOLUMES: "true"
-  #     WATCHTOWER_INCLUDE_STOPPED: "true"
-  #     WATCHTOWER_NO_STARTUP_MESSAGE: "false"
-  #     WATCHTOWER_SCHEDULE: "0 30 12 * * *" # Everyday at 12:30
-  #     WATCHTOWER_NOTIFICATIONS: shoutrrr
-  #     WATCHTOWER_NOTIFICATION_URL: "telegram://$TGRAM_BOT_TOKEN@telegram?channels=$TGRAM_CHAT_ID"
-  #     WATCHTOWER_NOTIFICATIONS_LEVEL: info
-  #     DOCKER_HOST: tcp://socket-proxy:2375
-  #     DOCKER_API_VERSION: "1.40"
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    networks:
+      - default
+      - socket_proxy
+    depends_on:
+      - socket-proxy
+    environment:
+      TZ: $TZ
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_REMOVE_VOLUMES: "true"
+      WATCHTOWER_INCLUDE_STOPPED: "true"
+      WATCHTOWER_NO_STARTUP_MESSAGE: "false"
+      WATCHTOWER_SCHEDULE: "0 30 12 * * *" # Everyday at 12:30
+      WATCHTOWER_NOTIFICATIONS: shoutrrr
+      WATCHTOWER_NOTIFICATION_URL: "telegram://$TGRAM_BOT_TOKEN@telegram?channels=$TGRAM_CHAT_ID"
+      WATCHTOWER_NOTIFICATIONS_LEVEL: info
+      DOCKER_HOST: tcp://socket-proxy:2375
+      DOCKER_API_VERSION: "1.40"
 
   # Docker-GC - Automatic Docker Garbage Collection
   # Create docker-gc-exclude file
-  # dockergc:
-  #   image: clockworksoul/docker-gc-cron:latest
-  #   container_name: docker-gc
-  #   restart: unless-stopped
-  #   networks:
-  #     - socket_proxy
-  #   depends_on:
-  #     - socket-proxy
-  #   volumes:
-  #     # - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
-  #     - $DOCKERDIR/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
-  #   environment:
-  #     CRON: 0 0 0 * * ? # Everyday at midnight. Previously 0 0 * * *
-  #     FORCE_IMAGE_REMOVAL: 1
-  #     FORCE_CONTAINER_REMOVAL: 0
-  #     GRACE_PERIOD_SECONDS: 604800
-  #     DRY_RUN: 0
-  #     CLEAN_UP_VOLUMES: 1
-  #     TZ: $TZ
-  #     DOCKER_HOST: tcp://socket-proxy:2375
+  dockergc:
+    # image: clockworksoul/docker-gc-cron:latest
+    image: rasaro/docker-gc-cron:latest # arm
+    container_name: docker-gc
+    restart: unless-stopped
+    networks:
+      - socket_proxy
+    depends_on:
+      - socket-proxy
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock # Use Docker Socket Proxy instead for improved security
+      - $DOCKERDIR/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
+    environment:
+      CRON: 0 0 0 * * ? # Everyday at midnight. Previously 0 0 * * *
+      FORCE_IMAGE_REMOVAL: 1
+      FORCE_CONTAINER_REMOVAL: 0
+      GRACE_PERIOD_SECONDS: 604800
+      DRY_RUN: 0
+      CLEAN_UP_VOLUMES: 1
+      TZ: $TZ
+      DOCKER_HOST: tcp://socket-proxy:2375
 
   # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
   certdumper:
