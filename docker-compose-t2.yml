@@ -248,14 +248,14 @@ services:
     # command: --rule.radarr.action=allow --rule.radarr.rule="Headers(`X-Api-Key`, `$RADARR_API_KEY`)"
     # command: --rule.sabnzbd.action=allow --rule.sabnzbd.rule="HeadersRegexp(`X-Forwarded-Uri`, `$SABNZBD_API_KEY`)"
     environment:
-      - CLIENT_ID=/run/secrets/google_client_id
-      - CLIENT_SECRET=/run/secrets/google_client_secret
-      - SECRET=/run/secrets/oauth_secret
+      - CLIENT_ID=$GOOGLE_CLIENT_ID
+      - CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+      - SECRET=$OAUTH_SECRET
       - COOKIE_DOMAIN=$DOMAINNAME
       - INSECURE_COOKIE=false
       - AUTH_HOST=oauth.$DOMAINNAME
       - URL_PATH=/_oauth
-      - WHITELIST_FILE=/run/secrets/my_email
+      - WHITELIST_FILE=$MY_EMAIL
       - LOG_LEVEL=warn
       - LOG_FORMAT=text
       - LIFETIME=2592000 # 30 days
