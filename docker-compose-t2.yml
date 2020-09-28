@@ -581,7 +581,7 @@ services:
       - "traefik.http.routers.glances-rtr.entrypoints=https"
       - "traefik.http.routers.glances-rtr.rule=HostHeader(`nglances.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.glances-rtr.middlewares=chain-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.glances-rtr.service=glances-svc"
       - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
@@ -650,7 +650,8 @@ services:
       - "traefik.http.routers.dozzle-rtr.entrypoints=https"
       - "traefik.http.routers.dozzle-rtr.rule=HostHeader(`dozzle.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
+      # - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.dozzle-rtr.middlewares=chain-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
       - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
