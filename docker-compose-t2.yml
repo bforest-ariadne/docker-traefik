@@ -179,7 +179,7 @@ services:
   # Docker Socket Proxy - Security Enchanced Proxy for Docker Socket
   socket-proxy:
     container_name: socket-proxy
-    image: fluencelabs/docker-socket-proxy
+    image: tprasadtp/docker-socket-proxy
     restart: always
     networks:
       # t2_proxy:
